@@ -1,4 +1,29 @@
 import { parseHTML } from "linkedom";
+import sanitizeHtml from "sanitize-html";
+
+/**
+ * Final gate before the body leaves this module. The article is third-party
+ * HTML that we serve on a public URL, so structure passes and active content
+ * does not: no event handlers, no javascript: URLs, no unknown tags.
+ */
+const SANITIZE: sanitizeHtml.IOptions = {
+  allowedTags: [
+    "a", "abbr", "b", "blockquote", "br", "caption", "cite", "code", "dd",
+    "del", "dfn", "dl", "dt", "em", "figcaption", "figure", "h1", "h2", "h3",
+    "h4", "h5", "h6", "hr", "i", "img", "ins", "kbd", "li", "mark", "ol", "p",
+    "pre", "q", "s", "samp", "small", "strong", "sub", "sup", "table", "tbody",
+    "td", "tfoot", "th", "thead", "tr", "u", "ul", "div", "span",
+  ],
+  allowedAttributes: {
+    a: ["href", "title"],
+    img: ["src", "alt", "width", "height"],
+    td: ["colspan", "rowspan"],
+    th: ["colspan", "rowspan", "scope"],
+  },
+  allowedSchemes: ["http", "https", "mailto"],
+  allowProtocolRelative: false,
+  disallowedTagsMode: "discard",
+};
 
 /** Attributes lazy-loading scripts hide the real image URL behind. */
 const LAZY_SRC = [
@@ -88,6 +113,8 @@ export function normalise(
       if (raw && !raw.startsWith("data:")) src = absolute(raw, baseUrl);
     }
 
+    if (src && !/^https?:/i.test(src)) src = null;
+
     const width = Number.parseInt(img.getAttribute("width") ?? "0", 10);
     const height = Number.parseInt(img.getAttribute("height") ?? "0", 10);
     const isPixel = width > 0 && width <= 2 && height > 0 && height <= 2;
@@ -140,5 +167,6 @@ export function normalise(
     if (!hasMedia && !(el.textContent ?? "").trim()) el.remove();
   }
 
-  return { html: root.innerHTML.trim(), images };
+  const clean = sanitizeHtml(root.innerHTML, SANITIZE).trim();
+  return { html: clean, images };
 }

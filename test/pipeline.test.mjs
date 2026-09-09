@@ -43,6 +43,41 @@ test("normalise makes relative links absolute", () => {
   assert.match(html, /href="https:\/\/example\.com\/other"/);
 });
 
+test("normalise strips inline event handlers", () => {
+  const { html } = normalise(
+    `<p onclick="steal()">text</p><img src="/a.png" onerror="steal()">`,
+    BASE,
+  );
+  assert.doesNotMatch(html, /onclick|onerror/);
+  assert.match(html, /<p>text<\/p>/);
+});
+
+test("normalise drops javascript: links but keeps their text", () => {
+  const { html } = normalise(
+    `<p><a href="javascript:alert(1)">click</a> and <a href="/ok">fine</a></p>`,
+    BASE,
+  );
+  assert.doesNotMatch(html, /javascript:/);
+  assert.match(html, /click/);
+  assert.match(html, /href="https:\/\/example\.com\/ok"/);
+});
+
+test("normalise removes script tags and unknown elements", () => {
+  const { html } = normalise(
+    `<p>a</p><script>steal()</script><object data="x"></object>`,
+    BASE,
+  );
+  assert.doesNotMatch(html, /script|object|steal/);
+});
+
+test("normalise keeps non-http image URLs out of the download list", () => {
+  const { images } = normalise(
+    `<img src="javascript:alert(1)"><img src="/real.png">`,
+    BASE,
+  );
+  assert.deepEqual(images, ["https://example.com/real.png"]);
+});
+
 const article = {
   sourceUrl: BASE,
   title: 'A "Great" <Article>',
