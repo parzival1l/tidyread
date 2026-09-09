@@ -1,0 +1,36 @@
+{
+  "name": "tidyread",
+  "version": "0.1.0",
+  "description": "Clean an article once, hand it to Instapaper's parser pre-chewed, and build a Kobo-ready EPUB.",
+  "main": "dist/cli.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "@extractus/article-extractor": "^9.0.1",
+    "@mozilla/readability": "^0.6.0",
+    "commander": "^15.0.0",
+    "defuddle": "^0.19.3",
+    "jszip": "^3.10.2",
+    "linkedom": "^0.18.13",
+    "sanitize-html": "^2.17.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.5.0",
+    "@types/sanitize-html": "^2.16.1",
+    "typescript": "^7.0.2"
+  },
+  "bin": {
+    "tidyread": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ]
+}
