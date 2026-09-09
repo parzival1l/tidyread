@@ -4,12 +4,26 @@
   "description": "Clean an article once, hand it to Instapaper's parser pre-chewed, and build a Kobo-ready EPUB.",
   "main": "dist/cli.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --test",
     "build": "tsc",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run build && npm test",
+    "prepublishOnly": "npm run check",
+    "pack:dry-run": "npm pack --dry-run"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "instapaper",
+    "kobo",
+    "epub",
+    "kepub",
+    "readability",
+    "read-later",
+    "article",
+    "e-ink",
+    "defuddle"
+  ],
+  "author": "parzival1l <nandhu02111997@gmail.com>",
   "license": "MIT",
   "type": "module",
   "dependencies": {
@@ -31,6 +45,18 @@
   },
   "files": [
     "dist",
-    "README.md"
-  ]
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/parzival1l/tidyread.git"
+  },
+  "homepage": "https://github.com/parzival1l/tidyread#readme",
+  "bugs": {
+    "url": "https://github.com/parzival1l/tidyread/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  }
 }
