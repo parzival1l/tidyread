@@ -1,6 +1,6 @@
 {
   "name": "tidyread",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Clean an article once, hand it to Instapaper's parser pre-chewed, and build a Kobo-ready EPUB.",
   "main": "dist/cli.js",
   "scripts": {
@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "check": "npm run build && npm test",
     "prepublishOnly": "npm run check",
-    "pack:dry-run": "npm pack --dry-run"
+    "pack:dry-run": "npm pack --dry-run",
+    "prepare": "npm run build"
   },
   "keywords": [
     "instapaper",
@@ -28,6 +29,7 @@
   "type": "module",
   "dependencies": {
     "@mozilla/readability": "^0.6.0",
+    "cloudflared": "^0.7.3",
     "commander": "^15.0.0",
     "defuddle": "^0.19.3",
     "jszip": "^3.10.2",

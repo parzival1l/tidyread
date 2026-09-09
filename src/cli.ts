@@ -42,7 +42,11 @@ program
   .option("-o, --out <dir>", "output directory", DEFAULT_OUT)
   .option("--no-epub", "skip the EPUB and KEPUB build")
   .option("--no-send", "build files only, never open a tunnel")
-  .option("--open", "save via the browser instead of the Simple API")
+  .option(
+    "--api",
+    "save with the Instapaper Simple API using INSTAPAPER_USERNAME and " +
+      "INSTAPAPER_PASSWORD, instead of the browser",
+  )
   .option("--keep-open", "leave the tunnel up until you press Ctrl-C")
   .action(async (url: string, opts) => {
     const outDir = resolve(opts.out);
@@ -88,13 +92,20 @@ program
     try {
       log("tunnel", publicUrl);
 
-      const creds = credentialsFromEnv();
-      if (opts.open || !creds) {
-        addByBrowser(publicUrl);
-        log("browser", "opened Instapaper save page — confirm it in the tab");
-      } else {
+      // Default: your browser's existing Instapaper session does the save.
+      // tidyread never asks for credentials.
+      if (opts.api) {
+        const creds = credentialsFromEnv();
+        if (!creds) {
+          throw new Error(
+            "--api needs INSTAPAPER_USERNAME and INSTAPAPER_PASSWORD set",
+          );
+        }
         await addByApi(publicUrl, article.title, creds);
         log("instapaper", `saved as "${article.title}"`);
+      } else {
+        addByBrowser(publicUrl);
+        log("browser", "opened Instapaper save page — confirm it in the tab");
       }
 
       const timeout = new Promise<null>((r) =>

@@ -4,6 +4,7 @@ import { writeFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { basename, extname } from "node:path";
+import { kepubifyBin } from "./bins.js";
 import type { Article } from "./types.js";
 import { readingMinutes } from "./render.js";
 
@@ -183,11 +184,11 @@ ${body}
 
 /** Convert to Kobo's EPUB dialect, for real page numbers and reading stats. */
 export async function toKepub(epubPath: string): Promise<string | null> {
+  const bin = await kepubifyBin();
+  if (!bin) return null;
   const outPath = epubPath.replace(/\.epub$/, ".kepub.epub");
   const ok = await new Promise<boolean>((resolve) => {
-    const child = spawn("kepubify", ["-o", outPath, epubPath], {
-      stdio: "ignore",
-    });
+    const child = spawn(bin, ["-o", outPath, epubPath], { stdio: "ignore" });
     child.once("error", () => resolve(false));
     child.once("exit", (code) => resolve(code === 0));
   });

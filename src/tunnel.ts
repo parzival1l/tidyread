@@ -1,4 +1,5 @@
 import { spawn, type ChildProcess } from "node:child_process";
+import { cloudflaredBin } from "./bins.js";
 
 export interface Tunnel {
   /** Public https origin, e.g. "https://foo-bar.trycloudflare.com". */
@@ -18,8 +19,9 @@ const START_TIMEOUT_MS = 30_000;
  * and nothing heavier.
  */
 export async function openTunnel(port: number): Promise<Tunnel> {
+  const bin = await cloudflaredBin();
   const child: ChildProcess = spawn(
-    "cloudflared",
+    bin,
     [
       "tunnel",
       "--no-autoupdate",
@@ -45,12 +47,7 @@ export async function openTunnel(port: number): Promise<Tunnel> {
     child.stderr?.on("data", scan);
     child.once("error", (err) => {
       clearTimeout(timer);
-      reject(
-        new Error(
-          `could not start cloudflared: ${err.message}. ` +
-            `Install it with: brew install cloudflared`,
-        ),
-      );
+      reject(new Error(`could not start cloudflared: ${err.message}`));
     });
     child.once("exit", (code) => {
       clearTimeout(timer);
