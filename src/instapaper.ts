@@ -50,9 +50,15 @@ export async function addByApi(
   throw new Error(`Instapaper returned ${res.status} ${res.statusText}`);
 }
 
-/** Open the save page in the default browser, using the existing session. */
+/**
+ * Open the save page in the browser, using the existing session.
+ * Set TIDYREAD_BROWSER (e.g. "Safari") to pick an app; otherwise the
+ * system default browser opens it.
+ */
 export function addByBrowser(url: string): string {
   const saveUrl = `${SAVE_URL}?url=${encodeURIComponent(url)}`;
-  spawn("open", [saveUrl], { stdio: "ignore", detached: true }).unref();
+  const app = process.env.TIDYREAD_BROWSER?.trim();
+  const args = app ? ["-a", app, saveUrl] : [saveUrl];
+  spawn("open", args, { stdio: "ignore", detached: true }).unref();
   return saveUrl;
 }
